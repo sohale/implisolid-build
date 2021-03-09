@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>MP5 in Action</title>
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        /*right: 60%; or 10%*/
+        left: 0;
+        z-index: 1000;
+    }
+.mycanvas3d {
+/*
+       position: absolute;
+       top: 0;
+       bottom: 0;
+       right: 0;
+       left: 0;
+*/
+       position: absolute;
+       right: 0;
+       z-index: -10;
+       /*left: 38%;*/
+      /* background-color: #f00;*/
+
+ }
+
+/*
+.ace-monokai {
+  background-color: red !important;
+  //background-color: #272822;
+  //color: #F8F8F2
+}
+*/
+/*
+.mybg {
+  background-color: red !important;
+}
+*/
+</style>
+</head>
+
+
+<script>
+    'use strict';
+     var S1 = {
+	    "printerSettings": {},
+	    "mp5-version": "0.3",
+	    "root": {
+		"type": "root",
+		"children": [{
+		    "type": "Difference",
+		    "children": [{
+		        "type": "cylinder",
+		        "matrix": [35, 0, 0, 0, 0, 35, 0, 0, 0, 0, 9, 0, 0, 0, 0, 1],
+		        "index": 652818
+		    }, {
+		        "type": "cylinder",
+		        "matrix": [8, 0, 0, 0.658,  0,19, 0, 6.215, 0, 0, 12, 0, 0, 0, 0, 1],
+		        "index": 246357
+		    }],
+		    "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+		}]
+	    }
+	};
+
+    // multi-object
+    var S2 = {
+    "printSettings": {},
+    "mp5-version": "0.3",
+    "root": {
+        "type": "root",
+        "children": [{
+            "type": "Difference",
+            "protected": false,
+            "children": [{
+                "type": "cylinder",
+                "displayColor": [0.77, 0.039, 0.17],
+                "matrix": [35, 0, 0, 0, 0, 35, 0, 0, 0, 0, 9, 0, 0, 0, 0, 1],
+                "index": 652818
+            },
+            {
+                "type": "Difference",
+                "children": [{
+                    "type": "cylinder",
+                    "displayColor": [0.81, 0.657, 0.736],
+                    "matrix": [10, 0, 0, 0, 0, 10, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1],
+                    "index": 1272174
+                },
+                {
+                    "type": "cylinder",
+                    "displayColor": [0.114, 0.075, 0.63],
+                    "matrix": [10, 0, 0, 0.658, 0, 10, 0, 6.2155, 0, 0, 10, 0, 0, 0, 0, 1],
+                    "index": 2463576
+                }],
+                "displayColor": [0.662, 0.45, 0.72],
+                "matrix": [2.381193, 0, 0, 0.36, 0, 2.3811, 0, 0.560, 0, 0, 2.38119, 6.90, 0, 0, 0, 1],
+                "index": 413872
+            }],
+            "displayColor": [0.55, 0.06, 0.11],
+            "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+            "index": 6565922
+        },
+                        {
+                    "type": "cylinder",
+                    "displayColor": [0.114, 0.075, 0.63],
+                    "matrix":  [10, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1, 9, 0, 0, 0, 1],
+                    "index": 2463576
+                }
+        ]
+    }
+};
+
+    var necklace = {"printerSettings":{"PRINTER":"Ultimaker Origin","FILAMENT":"PLA","DEFAULT":0},"mp5-version":"0.4","root":{"type":"root","children":[{"type":"Difference","protected":false,"children":[{"type":"icylinder","displayColor":[0.77,0.039,0.17],"matrix":[35,0,0,0,0,35,0,0,0,0,9,0,0,0,0,1],"index":652818},{"type":"Difference","protected":false,"children":[{"type":"icylinder","displayColor":[0.81,0.657,0.736],"matrix":[10,0,0,0,0,10,0,0,0,0,10,0,0,0,0,1],"index":1272174},{"type":"icylinder","displayColor":[0.114,0.075,0.63],"matrix":[10,0,0,0.658,0,10,0,6.2155,0,0,10,0,0,0,0,1],"index":2463576}],"displayColor":[0.662,0.45,0.72],"matrix":[2.381193,0,0,0.36,0,2.3811,0,0.56,0,0,2.38119,6.9,0,0,0,1],"index":413872}],"displayColor":[0.55,0.06,0.11],"matrix":[1,0,0,0.329,0,1,0,0.156,0,0,1,4.5,0,0,0,1],"index":6565922},{"type":"icylinder","displayColor":[0.114,0.075,0.63],"matrix":[10,3,0,0,0,10,0,0,0,0,1,5.5,0,0,0,1],"index":2463576}]},"createdAt":"2016-12-27T00:16:07.739Z","title":"necklace","description":"My first hand-written MP5","contributors":["wd: sosi9"],"unique_id":"3ef4a9f2-6175-4a9d-b421-720eac674d89","licence":{}}
+
+
+    var asmjscb_example1 = 
+           {
+               "printerSettings": {
+                   "PRINTER": "Ultimaker Origin",
+                   "FILAMENT": "PLA",
+                   "DEFAULT": 0
+               },
+               "mp5-version": "0.4",
+               "root": {
+                   "type": "root",
+                   "children":
+                   [
+                       {
+                           "type": "asmjscb",
+                           "displayColor": [0.114, 0.075, 0.63],
+                           "param1": 0.5,
+                           //"matrix": [10, 3, 0, 0, 0, 10, 0, 0, 0, 0, 1, 5.5, 0, 0, 0, 1],
+                           "matrix": [10, 0, 0, 0, 0, 10, 0, 0, 0, 0, 10, 0, 0, 0, 0, 1],
+                           "index": 2463576,
+                           "implicit": "_f =  (+R)*(+R) - ((_x) *(_x) + _y * _y + _z * _z);",
+                           "gradient": "_gx = -2 * _x; _gy = -2 * _y; _gz = -2 * _z;"
+                       }
+                   ]
+               },
+               "createdAt": "2016-12-27",
+               "title": "first asmjscb object!",
+               "description": "Dynamically specify the function ans ASM JS fast JIT evaluation",
+               "contributors": ["sohail"],
+               "unique_id": "3ef4a9f2-6175-4a9d-b421-720eac674d89",
+               "licence": {}
+           };
+    // ****************************************************
+    const asmjscb_example2 = {
+        "printerSettings": {
+            "PRINTER": "Ultimaker Origin",
+            "FILAMENT": "PLA",
+            "DEFAULT": 0
+        },
+        "mp5-version": "0.4",
+        "root": {
+            "type": "root",
+            "children": [{
+                "type": "asmjscb",
+                "displayColor": [0.114, 0.075, 0.63],
+                "param1": 0.5,
+                "matrix": [10, 0, 0, 0,   0, 10, 0, 0,   0, 0, 10, 0,   0, 0, 0, 1],
+                "index": 2463577,
+
+                "implicit": "_f =  (+param1)*(+param1) - ((_x/0.7) *(_x/0.7) + _y * _y + _z * _z);",
+                "gradient": "_gx = (-2) * _x /(0.7); _gy = -2 * _y; _gz = -2 * _z;"
+            },{
+                "type": "asmjscb",
+                "displayColor": [0.114, 0.4, 0.0],
+                "param1": 0.5,
+                "matrix": [10,0,0,5,    0,10,0,0,    0,0,10,0,    0,0,0,1],
+                "index": 2463578,
+                //"implicit": "_f =  (+param1)*(+param1) - ((_x) *(_x) + _y * _y + _z * _z);",
+                //"gradient": "_gx = (-2) * _x ; _gy = -2 * _y; _gz = -2 * _z;"
+                "implicit": "m=6; _f =  (+param1)**m - ((_x) **m + _y **m + _z **m);",
+                "gradient": "m=6; _gx = (-m) * (_x**(m-1)) ; _gy = -2 *( _y**(m-1)); _gz = -2 * (_z**(m-1));"
+            },{
+                "type": "cylinder",
+                "displayColor": [1, 0.075, 0],
+                "matrix": [5,0,0,8,  0,5,0,3,   0,0,10,0,   0,0,0,1],
+                "index": 2463579
+            }]
+        },
+        "createdAt": "2016-12-27",
+        "title": "asmjs example 2",
+        "description": "Multiple colours",
+        "contributors": ["sohail"],
+        "unique_id": "3ef4a9f2-6175-4a9d-b421-720eac674d89",
+        "licence": {}
+    };
+    //, { "type": "cylinder", "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }
+    /*
+    "implicit": "m=4; _f =  (+param1)**m - ((_x) **m + _y **m + _z **m);",
+    "gradient": "m=4;_gx = (-m) * (_x**(m-1)) ; _gy = -2 *( _y**(m-1)); _gz = -2 * (_z**(m-1));"
+    */
+
+    //var startup_text = JSON.stringify(S1);
+
+    //var MOON = '{"printSettings":{},"mp5-version":"0.3","root":{"type":"root","children":[{"type":"Difference","protected":false,"children":[{"type":"cylinder","displayColor":[0.77,0.039,0.17],"matrix":[35,0,0,0,0,35,0,0,0,0,9,0,0,0,0,1],"index":652818},{"type":"Difference","children":[{"type":"cylinder","displayColor":[0.81,0.657,0.736],"matrix":[10,0,0,0,0,10,0,0,0,0,10,0,0,0,0,1],"index":1272174},{"type":"cylinder","displayColor":[0.114,0.075,0.63],"matrix":[10,0,0,0.658,0,10,0,6.2155,0,0,10,0,0,0,0,1],"index":2463576}],"displayColor":[0.662,0.45,0.72],"matrix":[2.381193,0,0,0.36,0,2.3811,0,0.560,0,0,2.38119,6.90,0,0,0,1],"index":413872}],"displayColor":[0.55,0.06,0.11],"matrix":[1,0,0,0.329,0,1,0,0.156,0,0,1,0.0,0,0,0,1],"index":6565922}]}}';
+    //var startup_text = MOON;
+
+    //var screw_mp5 = {"printerSettings":{"d":2},"mp5-version":"0.3","root":{"type":"root","children":[{"type":"screw","matrix":[1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1],"v":[0,2,0],"pitch":0.5,"profile":"sin","delta_ratio":1.5,"end_type":"0","index":9185154}]}};
+    //var startup_text = JSON.stringify(screw_mp5);
+
+    // var startup_text = JSON.stringify(S2);
+    // var startup_text = JSON.stringify(necklace);  // nicest
+    // var startup_text = JSON.stringify(asmjscb_example1);  // very experimental
+    var startup_text = JSON.stringify(asmjscb_example2);  // actually works well. (apart from bad ellipsoid if hard-coded )
+
+</script>
+<script>
+
+    'use strict';
+    var asmjscb__func_table = {};
+
+    // compiler !
+    function make_fg (expression, grad_expression) {
+        const prefix_f = `
+            'use asm';  //  "reports validation errors in developer consoles only where relevant."
+            param1 = +param1;
+            
+            //var R = +0.5;
+            var R = +param1;
+            var x0 = +0.5*0, y0 = +0.5*0, z0 = +0.5*0;
+            var i = 0|0, i3 = 0|0;
+            for(i=0|0; i < points|0; ++i) {
+                i3 = (i|0)*3;
+        `, suffix_f = `
+            }
+        `, prefix_g = `
+            'use asm';
+            param1 = +param1;
+            var R = +param1;
+            
+            var i = 0|0, i3 = 0|0;
+            for(i = 0|0; i < points|0; ++i) {
+                i3 = (i|0)*3;
+        `, suffix_g = `
+            }
+        `;
+        var table = {
+            "_x": "(+x[(i3|0)])",
+            "_y": "(+x[(i3|0) + 1])",
+            "_z": "(+x[(i3|0) + 2])",
+            "_f": "f[i]",
+            "_gx": "(g[(i3|0)])",
+            "_gy": "(g[(i3|0) + 1])",
+            "_gz": "(g[(i3|0) + 2])",
+            //"p1": "(+param1)",
+        };
+
+        var expression_r = expression;
+        for (var k in table) {
+            do {
+                var old_expression_r = expression_r;
+                expression_r = expression_r.replace(k, table[k]);
+            } while (old_expression_r !== expression_r);
+            console.log(expression_r);
+        }
+        var grad_expression_r = grad_expression;
+        for (var k in table) {
+            //grad_expression_r = grad_expression_r.replace(k, table[k]);
+            do {
+                var old_grad_expression_r = grad_expression_r;
+                grad_expression_r = grad_expression_r.replace(k, table[k]);
+            } while (old_grad_expression_r !== grad_expression_r);
+            console.log(grad_expression_r);
+        }
+
+        var f_source_code = prefix_f + expression_r + suffix_f;
+        var g_source_code = prefix_g + grad_expression_r + suffix_g;
+        console.debug(f_source_code);
+        //console.error(prefix_f);
+        //var func = new Function("_x", "_y", "_z", "_f", "param1","points", f_source_code);
+        //var gfunc = new Function("_x", "_y", "_z", "_gx", "_gy", "_gz", "param1","points", prefix_g + grad_expression_r + suffix_g);
+        var func = new Function("x", "f", "points", "param1",  f_source_code);
+        var gfunc = new Function("x", "g", "points", "param1", g_source_code);
+        console.debug(func);
+        console.debug(gfunc);
+        //asmjscb__func_table[95] = func;
+        //asmjscb__grad_table[95] = gfunc;
+        return {eval_implicit: func, eval_gradient: gfunc};
+        // todo: rtest whether asm.js works on this.
+        // http://asmjs.org/faq.html
+        // http://asmjs.org/spec/latest/#modules
+    }
+
+
+    function make_fg94 () {
+        const obj94_eval_implicit = function (x, f, points, param1) {
+            param1 = +param1;
+            
+            var R = +0.5;
+            var x0 = +0.5*0, y0 = +0.5*0, z0 = +0.5*0;
+            var i = 0|0, i3 = 0|0;
+            for(i=0|0; i < points|0; ++i) {
+                i3 = (i|0)*3; // i3 = ((i|0) << 1) + (i|0);
+                //f[i] = +10 - Math.sqrt(+x[i3]*(+x[i3]) + +x[i3+1]*(+x[i3+1]) + +x[i3+2]*(+x[i3+2]));
+                //f[i] = (+R)*(+R) - (+x[i3]*(+x[i3]) + +x[i3+1]*(+x[i3+1]) + +x[i3+2]*(+x[i3+2]));
+                f[i] = (+R)*(+R) - ((+x[i3] - +x0)*(+x[i3] - +x0) + (+x[i3+1]- +y0)*(+x[i3+1] - +y0) + (+x[i3+2] - +z0)*(+x[i3+2] - +z0));
+            }
+            //console.log("x,f: ", x, f);
+        }
+
+        const obj94_eval_gradient = function (x, g, x_len, param1) {
+            var i = 0|0, i3 = 0|0;
+            for(i = 0|0; i < x_len|0; ++i) {
+                i3 = (i|0)*3; //((i|0) << 1) + (i|0);
+                //g[(i3|0)] = -2 * +x[(i3|0)];
+                //g[(i3|0) + 1] = -2 * +x[(i3|0) + 1];
+                //g[(i3|0) + 2] = -2 * +x[(i3|0) + 2];
+                //var x0 = +0.5*0, y0 = +0.5*0, z0 = +0.5*0;
+                g[(i3|0)] = -2 * +x[(i3|0)];
+                g[(i3|0) + 1] = -2 * +x[(i3|0) + 1];
+                g[(i3|0) + 2] = -2 * +x[(i3|0) + 2];
+            }
+            //console.log("x, g: ", x, g);        
+        }
+        return {eval_implicit: obj94_eval_implicit, eval_gradient: obj94_eval_gradient};
+    }
+
+    // dispatcher
+    // function js_implcit_callback(){console.log("ASMJS", arguments);}
+    function js_implcit_callback(id, x_start_ptr, x_len, output_start_ptr, param1) {
+        'use asm';
+
+        //     [94, 8463584, 15625, 7537720, 0.009999999776482582]
+        //console.log("ASMJS", arguments);
+        //console.log("id:",id, " x_start_ptr:",x_start_ptr, " x_len:", x_len, " output_start_ptr:", output_start_ptr, " param1", param1);
+        // $0, Module.HEAPF.subarray($1 >> 2, ($1+$2*3)>>2), Module.HEAPF.subarray($3 >> 2, ($3+$2*3)>>2)
+
+        x_start_ptr = x_start_ptr | 0;
+        x_len = x_len | 0;
+        //x_len = x_len * 2;
+        output_start_ptr = output_start_ptr | 0;
+        var x = Module.HEAPF32.subarray(x_start_ptr >> 2, (x_start_ptr>>2) + (x_len|0) * 3);
+        var f = Module.HEAPF32.subarray(output_start_ptr >> 2, (output_start_ptr >> 2) + (x_len|0));
+        //console.log("x,f: ", x, f);
+
+        id = id | 0;
+
+        /*if ((id|0) === (94|0)) {
+
+            //obj94_eval_implicit(x, f, x_len, param1);
+            throw "no longer";
+
+        } else*/ {
+
+            var fg = asmjscb__func_table[id|0];
+            
+            fg.eval_implicit(x, f, x_len, param1);
+
+            //throw "unknown ASMJS eval_implicit callback id";
+        }
+    }
+
+    function js_gradient_callback (id, x_start_ptr, x_len, output_start_ptr, param1) {
+        //console.log("ASMJS GRAD", arguments);
+
+        var x = Module.HEAPF32.subarray(x_start_ptr >> 2, (x_start_ptr>>2) + (x_len|0) * 3);
+        var g = Module.HEAPF32.subarray(output_start_ptr >> 2, (output_start_ptr >> 2) + ((x_len|0) * 3));  // prantheses are necesary 
+
+        //id = 95;
+        id = id | 0;
+        //if (id !== 94|0) throw "unknown ASMJS callback id";
+
+        /*
+        if ((id|0) === (94|0)) {
+
+            //obj94_eval_gradient(x, g, x_len, param1);
+            throw "no longer";
+
+        } else*/ {
+            
+            var fg = asmjscb__func_table[id|0];
+            
+            fg.eval_gradient(x, g, x_len, param1);
+
+            //throw "unknown ASMJS Gradient callback id";
+
+        }
+    }
+
+    // hard coded
+    const fg94 = make_fg94();
+
+    // runtime coded!
+    //var variables = ["R"];
+    var expression = `_f =  (+R)*(+R) - ((_x) *(_x) + _y * _y + _z * _z);`;
+    var grad_expression = `_gx = -2 * _x; _gy = -2 * _y; _gz = -2 * _z;`;
+
+    asmjscb__func_table[94] = make_fg (expression, grad_expression);
+
+/*
+(function($0,$1) {var stack = Runtime.stackSave();var str = $0;var ret = 0;
+   if (str !== null && str !== undefined && str !== 0) {
+    ret = Runtime.stackAlloc((str.length << 2) + 1);
+    writeStringToMemory(str, ret);
+   };$0=(ret);var str = $1;var ret = 0;
+   if (str !== null && str !== undefined && str !== 0) {
+    ret = Runtime.stackAlloc((str.length << 2) + 1);
+    writeStringToMemory(str, ret);
+   };$1=(ret);var ret = cfunc($0,$1);Runtime.stackRestore(stack);return ret})
+*/
+</script>
+
+
+<body style="background-color: #000000;">
+
+<!--
+<canvas class="mycanvas3d" width="500" height="300" id="my_canvas"></canvas>
+-->
+
+<div id="editor" style="background-color: rgba(1,0,0,0);">
+</div>
+
+</body>
+
+
+<!-- ************************** THREE JS **************************-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"> </script>
+<!--script type="text/javascript" src="../../../js_iteration_1/three_r79.js"> </script-->
+
+<script type="text/javascript" src="./js/OrbitControls_r79.js"></script>
+<!-- ************************** IMPLISOLID CODE **************************-->
+
+<script type="text/javascript" src="./js/simple_assert.js"></script>
+<script type="text/javascript" src="./js/geometry79.js"></script>
+<script type="text/javascript" src="./js/implisolid_main.js"></script>
+<script type="text/javascript" src="./js/example_objects.js"></script>
+<script type="text/javascript" src="./js/js_utils.js"></script> <!-- stuff used by pointset_utils.js -->
+<script type="text/javascript" src="./js/pointset_utils.js"></script>
+<script type="text/javascript" src="./js/arrow_utils.js"></script>
+<script type="text/javascript" src="./js/example_materials.js"></script>
+<script type="text/javascript" src="./js/performance_graphs.js"></script>
+<script type="text/javascript" src="./js/misc_props.js"></script>
+<script type="text/javascript" src="./js/boundingbox_utils.js"></script>
+
+
+<!-- ************************** OLD ********************************  - -
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"> </script>
+< ! - -script type="text/javascript" src="../../../js_iteration_1/three_r79.js"> </script - - >
+<script type="text/javascript" src="../../../js_iteration_1/controls/OrbitControls_r79.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/assert.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/geometry79.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/implisolid_main.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/example_objects.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/js/js_utils.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/js/pointset_utils.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/js/arrow_utils.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/example_materials.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/performance_graphs.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/misc_props.js"></script>
+<script type="text/javascript" src="../../../js_iteration_2/examples/js/boundingbox_utils.js"></script>
+-->
+
+<!-- ************************** ACE CODE **************************-->
+<!-- 
+http://www.jsoneditoronline.org/
+src="/ace-builds/src-noconflict/ace.js" 
+https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js
+https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-min-noconflict/ace.js
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript" charset="utf-8"></script>
+<!--script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-beautify.js" type="text/javascript" charset="utf-8"></script-->
+<!--script src="https://raw.githubusercontent.com/beautify-web/js-beautify/master/js/lib/beautify.js" type="text/javascript" charset="utf-8"></script-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.4/beautify.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+    'use strict';
+    // see https://ace.c9.io/#nav=howto
+
+    var eglobals = {reactive: false};
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    //editor.setTheme("ace/theme/ace_theme_1");
+    //editor.setTheme("ace/theme/clouds");
+    //editor.setTheme("ace/theme/pastel_on_dark");
+    //editor.setTheme("ace/theme/twilight");
+    //editor.getSession().setMode("ace/mode/javascript");
+    editor.getSession().setMode("ace/mode/json");
+    editor.getSession().on('change', function(e) {
+        if (!eglobals.reactive) return;
+            var text = editor.getValue(); // or session.getValue
+            build_code(text);
+
+        return;
+        // e.type, etc
+	/*
+	action: "insert"
+	start: {column:..., row:...},
+	end: {column:..., row:...},
+	lines: [","]
+	*/
+	console.log("change", e);
+        var val = editor.getValue(); // or session.getValue
+	//console.log("editor.getValue()", val);
+        //var val = session.getValue;
+	//console.log("session.getValue", val);
+        try {
+        var mp5_str = editor.getValue(); // or session.getValue
+        var mp5 = JSON.parse(mp5_str);
+        console.log(mp5);
+        console.log(JSON.stringify(mp5));
+        //beautify.beautify(editor.session);  // loops forever until your OS crashes!
+        }catch(e){}
+    });
+    editor.commands.addCommand({
+        name: 'myCommand',
+        bindKey: {win: 'Ctrl-M',  mac: 'Command-M'},
+        exec: function(editor) {
+            console.log("Comand M :MyCommand");
+        },
+        readOnly: true // false if this command should not apply in readOnly mode
+    });
+    editor.$blockScrolling = Infinity;
+
+    editor.setValue(`  
+
+"Please Wait ..."
+
+`);
+
+    //editor.setValue(startup_text);
+    //editor.setValue({});
+
+
+    var beautify = ace.require("ace/ext/beautify");
+    //var editor = ace.edit("editor");
+    //beautify.beautify(editor.session);
+    setTimeout(function(){
+        editor.setValue(startup_text);
+        my_beautify();
+        eglobals.reactive = true;
+        build_code( editor.getValue() );
+    }, 1500);
+
+function my_beautify() {
+    // beautify.beautify(editor.getSession());
+
+    var val = editor.getSession().getValue();
+    //Remove leading spaces
+    var array = val.split(/\n/);
+    array[0] = array[0].trim();
+    val = array.join("\n");
+    //Actual beautify (prettify) 
+    val = js_beautify(val);  // external
+    //Change current text to formatted text
+    editor.getSession().setValue(val);
+}
+
+function build_code(editor_text) {
+        try {
+            reset();
+            var mp5_json = editor_text;
+            var mp5 = JSON.parse(mp5_json);
+            var sons = mp5.root.children;
+            for( var i = 0; i < sons.length; ++i) {
+                var shape_dict = sons[i];
+                var bb = getBoundingBoxForDict(shape_dict, true);
+                //console.error("bbox", bb);  // ****
+                var shape_json = JSON.stringify(shape_dict);
+                //console.error("shape_json11",shape_json);    // ****
+                console.log(JSON.parse(shape_json));
+                var submesh = put_up_there(shape_json, bb, i, shape_dict.matrix, shape_dict.displayColor);
+            };
+        } catch(e) {
+            console.log(e.stack)
+            if (shape_json) {
+                console.debug('shape_json that caused error:', shape_json);
+            }
+            console.error("Exception:", e);
+        }
+
+}
+</script>
+
+<!--  ********************************************************************  -->
+<script>
+'use strict';
+
+var globals = {mesh_solid: [], main_mesh: null, /*mesh_wireframe: null, normals: null, arrows: null,*/ chosen_matrial:null, geometry: null, scene:null };
+var CONFIG = {CHOSEN_MATERIAL_INDEX: 2, PERSPECTIVE: true, SHOW_WIREFRAME: false, SHOW_SOLID: true, SPEED: 3. / 100, MESH_SCALE: 1.0};
+
+const simple_MC_only_polygonization_json = function(BSH) { return JSON.stringify({
+    resolution: Math.floor( 30 ),
+    box: //bbox,
+        {xmin: -BSH, xmax: +BSH, ymin: -BSH, ymax: +BSH, zmin: -BSH, zmax: +BSH},
+    ignore_root_matrix: true,
+
+    vresampl: {iters: 0, c: 1.0},
+
+    projection: {enabled: 0},
+    qem: {enabled: 0},
+    subdiv: {enabled: 0},
+    overall_repeats: 1,
+
+    debug: {
+        enabled_pointsets: 0,
+        // only_rank
+        post_subdiv_noise: 0.0,
+    },
+});};
+
+function reset() {
+    // reset tables
+    asmjscb__func_table = {};
+}
+
+function put_up_there(string_json, bb_arg, i, matrix, color_rgb) {
+    // var ignore_root_matrix = false;
+    //globals.geometry = IMPLICIT.getLiveGeometry_from_json(shape_json, polygonization_json, true, function(){}, ignore_root_matrix);
+
+    var shape_json = string_json;
+    //console.error(shape_json);
+    //console.error(polygonization_json);
+
+    if (!bb_arg) {
+
+        var polygonization_json = JSON.stringify(
+             {"resolution":40,"box":{"xmin":-0.55,"xmax":0.55,"ymin":-0.55,"ymax":0.55,"zmin":-0.55,"zmax":0.55},"ignore_root_matrix":false,"vresampl":{"iters":3,"c":1},"projection":{"enabled":1},"qem":{"enabled":1},"subdiv":{"enabled":1},"overall_repeats":1,"debug":{"enabled_pointsets":0,"post_subdiv_noise":0}}
+        );
+        polygonization_json = simple_MC_only_polygonization_json(0.5);
+        //var polygonization_json = JSON.stringify(d.polygonization_json);
+        //var shape_json = string_json;
+        //console.error(shape_json);
+        //console.error(polygonization_json);
+
+       var box1 = JSON.parse(polygonization_json).box;
+       var bbox = {min: {x:box1.xmin, y:box1.ymin, z:box1.zmin}, max: {x:box1.xmax, y:box1.ymax, z:box1.zmax}};
+
+    } else {
+
+        var bbox = bb_arg;
+
+    }
+    
+    // "asmjscb" objects
+    var shapedict = JSON.parse(shape_json);
+    if (shapedict.type === "asmjscb") {
+        var f = shapedict.implicit;
+        var g = shapedict.gradient;
+        var p = shapedict.param1;
+        var idx = shapedict.index;
+        assert(idx);
+        var fg = make_fg(f,g);
+        if (asmjscb__func_table[idx]) {
+            alert("Two object with the same \"index\": An object with index ="+idx+" is already created. "+JSON.stringify(idx));
+        }
+        if (!idx) {
+            alert("Object must have an \"index\": with a non-zero integer number. "+JSON.stringify(idx));
+        }
+        asmjscb__func_table[idx] = fg;
+    }
+    
+    CONFIG.implisolid = {default_mc_resolution: 20};
+    globals.geometry = IMPLICIT.getLiveGeometry(shape_json, bbox, true);
+    //globals.geometry = THREE.BoxGeometry();
+    assert(!CONFIG.SHOW_WIREFRAME);
+    assert(CONFIG.SHOW_SOLID);
+
+    if ( i === undefined) i = 0;
+    while (globals.mesh_solid.length < i+1) {
+        globals.mesh_solid.push(null);
+    }
+
+    // remove everything
+    if(globals.mesh_solid[i]) {
+        //globals.scene.remove( globals.mesh_solid[i] );
+        globals.main_mesh.remove( globals.mesh_solid[i] );
+        globals.mesh_solid[i] = null;
+        //globals.scene.remove( globals.main_mesh );
+        //globals.main_mesh = null;  //never
+    }
+    /*
+    if(globals.main_mesh) {
+        globals.main_mesh.remove( globals.mesh_solid[i] );
+        globals.mesh_solid[i] = null;
+        globals.main_mesh = null;
+    }
+    */
+
+
+    if(!globals.main_mesh) {
+        globals.main_mesh = new THREE.Object3D();
+        globals.scene.add(globals.main_mesh);
+    }
+
+    if(CONFIG.SHOW_SOLID){
+        // console.error(globals.geometry);
+        var material = look_nice()[CONFIG.CHOSEN_MATERIAL_INDEX];
+
+        var mesh = new THREE.Mesh( globals.geometry, material );
+        if (color_rgb) {
+            var alpha = color_rgb[3];
+            material.color.setRGB(color_rgb[0], color_rgb[1], color_rgb[2]);
+            if (alpha !== undefined) {
+                mesh.transparent = true;
+                mesh.opacity = alpha;
+            }
+        }
+        mesh.position.set( 0, 0, 0 );
+        mesh.scale.set( CONFIG.MESH_SCALE, CONFIG.MESH_SCALE, CONFIG.MESH_SCALE );
+        //globals.scene.add( mesh );
+        //globals.scene.add( globals.main_mesh );
+        globals.main_mesh.add(mesh);
+        globals.mesh_solid[i] = mesh;
+        console.error("OK", globals.mesh_solid[i]);
+
+    var submesh = globals.mesh_solid[i];
+
+                submesh.matrixAutoUpdate=false;
+                var m = matrix;
+                submesh.matrix.set(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+
+                console.error(m, submesh.matrix.elements);
+
+    }
+
+}
+
+function meat() {
+    'use strict';
+/*
+        var global_time  = 0.2 * 5;
+
+        var d = provide_input(global_time, 0, globals);
+        var shape_json = d.shape_json;
+
+        put_up_there(shape_json);
+*/
+}
+
+function init_scene(IMPLICIT) {
+    'use strict';
+    var scene = new THREE.Scene();
+    globals.scene = scene;
+
+    // var render_canvas = document.getElementById('my_canvas');
+    /*var WIDTH = render_canvas.innerWidth,
+        HEIGHT = render_canvas.innerHeight;
+    */
+    //assert(WIDTH);
+    //assert(HEIGHT);
+    //desired_width, desired_height
+
+    globals.desired = {WIDTH:380, HEIGHT:310};
+
+    if (CONFIG.PERSPECTIVE) {
+        globals.camera = new THREE.PerspectiveCamera( 75, globals.desired.WIDTH / globals.desired.HEIGHT, 1, 10000 );  // ( fov, aspect, near, far )
+        //globals.camera.position.set();
+    } else {
+        // Use Orthogaphic camera
+        var span_per_pixel = 1.0/12.0;
+        var x0 = WIDTH/2.0*span_per_pixel;
+        var y0 = HEIGHT/2.0*span_per_pixel;
+        globals.camera = new THREE.OrthographicCamera( -x0,  +x0, -y0, +y0, 1, 10000 ); // ( left, right, top, bottom, near, far )
+    }
+    var GRID_CELL_SIZE = 1.0;
+    //globals.camera.position.set(0, 2, 40*GRID_CELL_SIZE);  // tele
+    globals.camera.position.set(0, 2, 21*GRID_CELL_SIZE);  // tele
+    //globals.camera.position.set(0, 0, 3*GRID_CELL_SIZE);  // close up
+    //var grid = grid_bed(GRID_CELL_SIZE);
+    //globals.scene.add( grid );
+    /*
+    globals.sizeListener = function(w,h){
+        globals.camera.aspect = w/ h;
+    };
+    */
+
+    //var materials_list = look_nice();
+    //globals.chosen_matrial = materials_list[CONFIG.CHOSEN_MATERIAL_INDEX];
+
+    //var grid = grid_bed(GRID_CELL_SIZE);
+    //globals.scene.add( grid );
+
+    var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(100, 100, 50);
+    globals.scene.add(dirLight);
+
+
+    var dirLight2 = new THREE.DirectionalLight(0x00ffff, 1);
+    dirLight2.position.set(-100, -100, -50);
+    globals.scene.add(dirLight2);
+
+    var renderer = new THREE.WebGLRenderer( { antialias: true/*, canvas: render_canvas*/ } );
+    //renderer.setSize ( 300, 300, true );
+    //renderer.setSize (desired_width, desired_height );
+    renderer.setSize ( globals.desired.WIDTH, globals.desired.HEIGHT, true);
+    globals.renderer = renderer;
+    document.body.appendChild( globals.renderer.domElement );
+
+    //var cnvs = document.querySelector('canvas');
+    var cnvs = globals.renderer.domElement;
+    //cnvs.classList.append("mycanvas3d");
+    cnvs.className = "mycanvas3d";
+
+    /*
+    globals.renderer.domElement.addEventListener('resize',function(e){
+        globals.sizeListener(e.width, e.height);
+    }, true);
+    */
+
+    var cameraControls = new THREE.OrbitControls( globals.camera, renderer.domElement );
+
+    cameraControls.rotateSpeed = 1.5;
+    cameraControls.zoomSpeed = 1.2;
+    cameraControls.panSpeed = 0.8;
+    cameraControls.enableZoom = true;
+    cameraControls.enablePan = true;
+    cameraControls.enableDamping = true;
+    cameraControls.dampingFactor = 0.6; //0.9; // 1.0; //motile: 0.3;
+    cameraControls.target.set( 0, 0, 0 );
+    cameraControls.addEventListener( 'change', function () {console.log("CC");} );
+    globals.cameraControls = cameraControls;
+
+}
+function animate() {
+    'use strict';
+    /*
+    for (var i = 0; i < globals.mesh_solid.length; ++i) {
+        //assert(globals.mesh_solid[i]);
+        if(globals.mesh_solid[i]) {
+            globals.mesh_solid[i].rotation.x += 0.01*CONFIG.SPEED;
+            globals.mesh_solid[i].rotation.y += 0.1*CONFIG.SPEED;
+            //globals.mesh_solid[i].rotation.set(10,10,10);
+            //console.error("rotate");
+        }
+    }
+    */
+    if (globals.main_mesh){
+        globals.main_mesh.rotation.x += 0.02*CONFIG.SPEED;
+        globals.main_mesh.rotation.y += 0.3*CONFIG.SPEED;
+    }
+    globals.renderer.render( globals.scene, globals.camera );
+    // console.log(globals.camera, globals.mesh_solid);
+    requestAnimationFrame( animate );
+}
+    var IMPLICIT;
+    var PS_UTILS;
+
+
+    var assert;
+    function startup_sequence() {
+    'use strict';
+        console.log("ready.");
+
+        assert = my_assert;
+        try{
+        assert = require('./js/simple_assert.js').assert;
+        } catch(err) {
+            function assert3(cond, message) {
+                if (!cond) {
+                    message = message || "Assertion failed for unspecified reason";
+                    console.error(message);
+                    console.error(message.stack);
+                    throw new Exception("assert ", message);
+                }
+            }
+            assert = assert3;
+        }
+
+        IMPLICIT = _on_cpp_loaded();  // from implisolid_main.js
+        PS_UTILS = new PS_UTILS_CLASS(IMPLICIT); 
+
+        /*
+        //if(delta_t === undefined)
+        var delta_t = 0.2 * 5;
+        // Subjective time!
+        global_time += delta_t;
+        */
+
+        /*
+        var global_time  = 0.2 * 5;
+
+        var d = provide_input(global_time, 0, globals);
+        var shape_json = d.shape_json;
+        var polygonization_json = JSON.stringify(d.polygonization_json);*/
+
+        //IMPLICIT.use_II = 0;
+        //IMPLICIT.use_III = 0;
+        //IMPLICIT.use_II_qem = 0;
+
+        init_scene(IMPLICIT);
+        animate();
+        
+        meat();
+    };
+</script>
+
+<script>
+    'use strict';
+        var startup_sequence;
+        var Module;
+        if (!Module)
+        Module =
+        {
+            preRun:[ ],
+            onRuntimeInitialized: startup_sequence,
+            // //memoryInitializerPrefixURL: "../../../build/",
+            // memoryInitializerPrefixURL: "../js/",
+            locateFile: (path, scriptDirectory) => "../js/",
+        };
+</script>
+<script type="text/javascript" src="./js/mcc2.compiled.js"></script>
+<!-- script type="text/javascript" src="../../../build/mcc2.compiled.js"></script -->
+
+<!--script type="text/javascript" src="https://beta.wedesign.live/mcc2.compiled.js"></script-->
+</html>
+
