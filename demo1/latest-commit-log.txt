@@ -1,5 +1,5 @@
-commit 5f87733679a68b065b254feba9c21c6f725297c9
+commit ba81d109c05ac9bd5cffb8e4d93bab19b38fcceb
 Author: Sohail Siadatnejad <sohale@gmail.com>
-Date:   Mon Mar 22 18:11:04 2021 +0000
+Date:   Mon Mar 22 19:26:23 2021 +0000
 
-    minor: failed attmpt to import, removing trailing spaces
+    better documentation in demo1-deploy.sh script
