@@ -221,7 +221,7 @@
         const prefix_f = `
             'use asm';  //  "reports validation errors in developer consoles only where relevant."
             param1 = +param1;
-            
+
             //var R = +0.5;
             var R = +param1;
             var x0 = +0.5*0, y0 = +0.5*0, z0 = +0.5*0;
@@ -234,7 +234,7 @@
             'use asm';
             param1 = +param1;
             var R = +param1;
-            
+
             var i = 0|0, i3 = 0|0;
             for(i = 0|0; i < points|0; ++i) {
                 i3 = (i|0)*3;
@@ -292,7 +292,7 @@
     function make_fg94 () {
         const obj94_eval_implicit = function (x, f, points, param1) {
             param1 = +param1;
-            
+
             var R = +0.5;
             var x0 = +0.5*0, y0 = +0.5*0, z0 = +0.5*0;
             var i = 0|0, i3 = 0|0;
@@ -317,7 +317,7 @@
                 g[(i3|0) + 1] = -2 * +x[(i3|0) + 1];
                 g[(i3|0) + 2] = -2 * +x[(i3|0) + 2];
             }
-            //console.log("x, g: ", x, g);        
+            //console.log("x, g: ", x, g);
         }
         return {eval_implicit: obj94_eval_implicit, eval_gradient: obj94_eval_gradient};
     }
@@ -350,7 +350,7 @@
         } else*/ {
 
             var fg = asmjscb__func_table[id|0];
-            
+
             fg.eval_implicit(x, f, x_len, param1);
 
             //throw "unknown ASMJS eval_implicit callback id";
@@ -374,9 +374,9 @@
             throw "no longer";
 
         } else*/ {
-            
+
             var fg = asmjscb__func_table[id|0];
-            
+
             fg.eval_gradient(x, g, x_len, param1);
 
             //throw "unknown ASMJS Gradient callback id";
@@ -427,6 +427,7 @@
 <script type="text/javascript" src="./js/OrbitControls_r79.js"></script>
 <!-- ************************** IMPLISOLID CODE **************************-->
 
+<!--script type="module" src="./js/simple_assert.js"></script-->
 <script type="text/javascript" src="./js/simple_assert.js"></script>
 <script type="text/javascript" src="./js/geometry79.js"></script>
 <script type="text/javascript" src="./js/implisolid_main.js"></script>
@@ -457,7 +458,7 @@
 <script type="text/javascript" src="../../../js_iteration_2/examples/js/boundingbox_utils.js"></script>
 -->
 
-<!-- ************************** ACE CODE **************************-->
+<!-- ************************** ACE **************************-->
 <!-- 
 http://www.jsoneditoronline.org/
 src="/ace-builds/src-noconflict/ace.js" 
@@ -470,7 +471,10 @@ https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-min-noconflict/a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.4/beautify.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
-    'use strict';
+'use strict';
+/* Why is `build_code_callback` called in two places? */
+function init_ace(build_code_callback) {
+
     // see https://ace.c9.io/#nav=howto
 
     var eglobals = {reactive: false};
@@ -485,28 +489,29 @@ https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-min-noconflict/a
     editor.getSession().on('change', function(e) {
         if (!eglobals.reactive) return;
             var text = editor.getValue(); // or session.getValue
-            build_code(text);
+            build_code_callback(text);
 
         return;
         // e.type, etc
-	/*
-	action: "insert"
-	start: {column:..., row:...},
-	end: {column:..., row:...},
-	lines: [","]
-	*/
-	console.log("change", e);
+        /*
+        action: "insert"
+        start: {column:..., row:...},
+        end: {column:..., row:...},
+        lines: [","]
+        */
+        console.log("change detected", e);
         var val = editor.getValue(); // or session.getValue
-	//console.log("editor.getValue()", val);
-        //var val = session.getValue;
-	//console.log("session.getValue", val);
+        //console.log("editor.getValue()", val);
+        //console.log("session.getValue", val);
         try {
-        var mp5_str = editor.getValue(); // or session.getValue
-        var mp5 = JSON.parse(mp5_str);
-        console.log(mp5);
-        console.log(JSON.stringify(mp5));
-        //beautify.beautify(editor.session);  // loops forever until your OS crashes!
-        }catch(e){}
+          var mp5_str = editor.getValue(); // or session.getValue
+          var mp5 = JSON.parse(mp5_str);
+          console.log(mp5);
+          console.log(JSON.stringify(mp5));
+          //beautify.beautify(editor.session);  // loops forever until your OS crashes!
+        } catch(e) {
+            console.log('invalid json in editor');
+        }
     });
     editor.commands.addCommand({
         name: 'myCommand',
@@ -518,11 +523,7 @@ https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-min-noconflict/a
     });
     editor.$blockScrolling = Infinity;
 
-    editor.setValue(`  
-
-"Please Wait ..."
-
-`);
+    editor.setValue(`\n\n"Please Wait ..."\n\n`);
 
     //editor.setValue(startup_text);
     //editor.setValue({});
@@ -531,25 +532,38 @@ https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-min-noconflict/a
     var beautify = ace.require("ace/ext/beautify");
     //var editor = ace.edit("editor");
     //beautify.beautify(editor.session);
+
     setTimeout(function(){
         editor.setValue(startup_text);
         my_beautify();
         eglobals.reactive = true;
-        build_code( editor.getValue() );
+        build_code_callback( editor.getValue() );
     }, 1500);
 
-function my_beautify() {
-    // beautify.beautify(editor.getSession());
+    function my_beautify() {
+        // beautify.beautify(editor.getSession());
 
-    var val = editor.getSession().getValue();
-    //Remove leading spaces
-    var array = val.split(/\n/);
-    array[0] = array[0].trim();
-    val = array.join("\n");
-    //Actual beautify (prettify) 
-    val = js_beautify(val);  // external
-    //Change current text to formatted text
-    editor.getSession().setValue(val);
+        var val = editor.getSession().getValue();
+        //Remove leading spaces
+        var array = val.split(/\n/);
+        array[0] = array[0].trim();
+        val = array.join("\n");
+        //Actual beautify (prettify)
+        val = js_beautify(val);  // external
+        //Change current text to formatted text
+        editor.getSession().setValue(val);
+    }
+}
+
+</script>
+
+<script>
+'use strict';
+
+
+function reset() {
+    // reset tables
+    asmjscb__func_table = {};
 }
 
 function build_code(editor_text) {
@@ -565,7 +579,7 @@ function build_code(editor_text) {
                 var shape_json = JSON.stringify(shape_dict);
                 //console.error("shape_json11",shape_json);    // ****
                 console.log(JSON.parse(shape_json));
-                var submesh = put_up_there(shape_json, bb, i, shape_dict.matrix, shape_dict.displayColor);
+                var submesh = put_up_there(shape_json, bb, i, shape_dict.matrix, shape_dict.displayColor, simple_MC_only_polygonization_json);
             };
         } catch(e) {
             console.log(e.stack)
@@ -576,14 +590,22 @@ function build_code(editor_text) {
         }
 
 }
+    ;
+    init_ace(build_code);
 </script>
 
 <!--  ********************************************************************  -->
-<script>
+<script  nottype="module">
 'use strict';
 
+/** main state of demo */
 var globals = {mesh_solid: [], main_mesh: null, /*mesh_wireframe: null, normals: null, arrows: null,*/ chosen_matrial:null, geometry: null, scene:null };
+
+/** Demo's config */
 var CONFIG = {CHOSEN_MATERIAL_INDEX: 2, PERSPECTIVE: true, SHOW_WIREFRAME: false, SHOW_SOLID: true, SPEED: 3. / 100, MESH_SCALE: 1.0};
+
+
+/** setting up the polygonisation task: provides a json for polygoniser as a task description. */
 
 const simple_MC_only_polygonization_json = function(BSH) { return JSON.stringify({
     resolution: Math.floor( 30 ),
@@ -605,12 +627,9 @@ const simple_MC_only_polygonization_json = function(BSH) { return JSON.stringify
     },
 });};
 
-function reset() {
-    // reset tables
-    asmjscb__func_table = {};
-}
-
-function put_up_there(string_json, bb_arg, i, matrix, color_rgb) {
+/**
+*/
+function put_up_there(string_json, bb_arg, i, matrix, color_rgb, polygonization_json_provider) {
     // var ignore_root_matrix = false;
     //globals.geometry = IMPLICIT.getLiveGeometry_from_json(shape_json, polygonization_json, true, function(){}, ignore_root_matrix);
 
@@ -623,7 +642,7 @@ function put_up_there(string_json, bb_arg, i, matrix, color_rgb) {
         var polygonization_json = JSON.stringify(
              {"resolution":40,"box":{"xmin":-0.55,"xmax":0.55,"ymin":-0.55,"ymax":0.55,"zmin":-0.55,"zmax":0.55},"ignore_root_matrix":false,"vresampl":{"iters":3,"c":1},"projection":{"enabled":1},"qem":{"enabled":1},"subdiv":{"enabled":1},"overall_repeats":1,"debug":{"enabled_pointsets":0,"post_subdiv_noise":0}}
         );
-        polygonization_json = simple_MC_only_polygonization_json(0.5);
+        polygonization_json = polygonization_json_provider(0.5);
         //var polygonization_json = JSON.stringify(d.polygonization_json);
         //var shape_json = string_json;
         //console.error(shape_json);
@@ -637,7 +656,7 @@ function put_up_there(string_json, bb_arg, i, matrix, color_rgb) {
         var bbox = bb_arg;
 
     }
-    
+
     // "asmjscb" objects
     var shapedict = JSON.parse(shape_json);
     if (shapedict.type === "asmjscb") {
@@ -655,7 +674,7 @@ function put_up_there(string_json, bb_arg, i, matrix, color_rgb) {
         }
         asmjscb__func_table[idx] = fg;
     }
-    
+
     CONFIG.implisolid = {default_mc_resolution: 20};
     globals.geometry = IMPLICIT.getLiveGeometry(shape_json, bbox, true);
     //globals.geometry = THREE.BoxGeometry();
@@ -734,7 +753,7 @@ function meat() {
 */
 }
 
-function init_scene(IMPLICIT) {
+function init_3js_scene(IMPLICIT, globals, THREE) {
     'use strict';
     var scene = new THREE.Scene();
     globals.scene = scene;
@@ -818,7 +837,12 @@ function init_scene(IMPLICIT) {
     globals.cameraControls = cameraControls;
 
 }
-function animate() {
+
+/** updates the globals state `globals`.
+ * globals is a prograam staate, i.e.e contains references, to meshes, scene objects, etc) not just parameters.
+ * Whatever changes during the animation.
+ */
+function per_frame_logic(globals) {
     'use strict';
     /*
     for (var i = 0; i < globals.mesh_solid.length; ++i) {
@@ -835,16 +859,25 @@ function animate() {
         globals.main_mesh.rotation.x += 0.02*CONFIG.SPEED;
         globals.main_mesh.rotation.y += 0.3*CONFIG.SPEED;
     }
+}
+
+/** Renders a frame, also triggers (drives) the next frame as a chain (of infitnite callbacks). */
+function animate_a_frame() {
+    'use strict';
+
+    per_frame_logic(globals);
+
     globals.renderer.render( globals.scene, globals.camera );
     // console.log(globals.camera, globals.mesh_solid);
-    requestAnimationFrame( animate );
+    requestAnimationFrame( animate_a_frame );
 }
+
+/** Global variables */
     var IMPLICIT;
     var PS_UTILS;
-
-
     var assert;
-    function startup_sequence() {
+
+function startup_sequence() {
     'use strict';
         console.log("ready.");
 
@@ -852,6 +885,7 @@ function animate() {
         try{
         assert = require('./js/simple_assert.js').assert;
         } catch(err) {
+            console.log('require does not work in browser.')
             function assert3(cond, message) {
                 if (!cond) {
                     message = message || "Assertion failed for unspecified reason";
@@ -863,8 +897,14 @@ function animate() {
             assert = assert3;
         }
 
+        /*
+        //import {assert3} from './js/simple_assert.js';
+        */
+
+
+
         IMPLICIT = _on_cpp_loaded();  // from implisolid_main.js
-        PS_UTILS = new PS_UTILS_CLASS(IMPLICIT); 
+        PS_UTILS = new PS_UTILS_CLASS(IMPLICIT);
 
         /*
         //if(delta_t === undefined)
@@ -884,12 +924,13 @@ function animate() {
         //IMPLICIT.use_III = 0;
         //IMPLICIT.use_II_qem = 0;
 
-        init_scene(IMPLICIT);
-        animate();
-        
+        init_3js_scene(IMPLICIT, globals, THREE);
+        animate_a_frame();
+
         meat();
-    };
+};
 </script>
+
 
 <script>
     'use strict';
