@@ -26,10 +26,19 @@ IMPLISOLID
 
 // LiveBufferGeometry71  MyBufferGeometry77 LiveBufferGeometry79
 
+function assert(cond, message) {
+  if (!cond) {
+      message = message || "Assertion failed for unspecified reason";
+      console.error(message);
+      console.error(message.stack);
+      throw new Error("assert ", message);
+  }
+}
+
 var ImplicitService = (function () {
 'use strict';
 
-function init(service) {
+function init(service, Module) {
     'use strict';
 
     // Low level API
@@ -44,7 +53,7 @@ function init(service) {
     service.get_f_ptr = Module.cwrap('get_f_ptr', 'number', []);
     service.finish_geometry = Module.cwrap('finish_geometry', null, []);
 
-    service.set_object = Module.cwrap('set_object', 'number', ['string', 'number']);
+    service.set_object = Module.cwrap('set_object', 'number', ['string', 'boolean']);
     service.unset_object = Module.cwrap('unset_object', 'number', ['number']);
     service.set_x = Module.cwrap('set_x', 'number', ['number', 'number']);  // sends the x points for evaluation of implicit or gradient
     service.unset_x = Module.cwrap('unset_x', null, []);
@@ -133,7 +142,7 @@ function init(service) {
  * Technical:
  * Wraps all accesses to Module. Suitable for weparating Worker from the main one.
  */
-function init2(impli2, impli1) {
+function init2(impli2, impli1, Module) {
 
     // replaced by query_normals()?
     function prepare_gradients1(implicit_service, shape_json, verts) {
@@ -190,8 +199,7 @@ function init2(impli2, impli1) {
 
 
     // mid-level API
-    //
-    
+
     /** Note that nomals are NOT queried & applied in this function.
     The inputs should be jsonified already. Although for bavkward compatibilty it is automatically converted.
     Note that in the similar "update" method, the polygonization_params must be non-JSONified. 
@@ -199,6 +207,7 @@ function init2(impli2, impli1) {
     // todo: remove allocate_buffer, because it will be set in the callback
     */
     impli2.make_geometry = function (mp5_str, polygonization_params_str, geometry_callback, allocate_buffer) {
+
         assert(typeof geometry_callback !== 'undefined');
         assert(geometry_callback);
 
@@ -215,7 +224,7 @@ function init2(impli2, impli1) {
             impli1.finish_geometry();
             impli1.needs_deallocation = false;
         }
-        
+
         // todo: surround build_geometry() by try{}catch{}
 
         //console.log("polygonization_params_str.resolution " + polygonization_params_str.resolution);
@@ -234,7 +243,6 @@ function init2(impli2, impli1) {
 
         var verts_address = impli1.get_v_ptr();
         var faces_address = impli1.get_f_ptr();
-
         var verts = Module.HEAPF32.subarray(verts_address/_FLOAT_SIZE, verts_address/_FLOAT_SIZE + 3*nverts);
         var faces = Module.HEAPU32.subarray(faces_address/_INT_SIZE, faces_address/_INT_SIZE + 3*nfaces);
 
@@ -799,50 +807,57 @@ function init3(service3, service2) {
     service3.service2 = service2;
 }
 
-var ImplicitService = function() {
+var _ImplicitService = function(Module) {
 
     var impli1 = {};
     // adds the low-level API to 'this'
-    init(impli1);
+    init(impli1, Module);
 
     var impli2 = {};
     // adds the mid-level API to 'this'
-    init2(impli2, impli1);
+    init2(impli2, impli1, Module);
 
     var impli3 = this;
     // adds the high-level API to 'this'
-    init3(impli3, impli2);
+    init3(impli3, impli2); // no `Module` arg
 
     // API interface functions:
-    console.log("impli1 ---------------");
-    for(var a in impli1) console.log("API Level1.",a);
-    console.log("impli2 ---------------");
-    for(var a in impli2) console.log("API Level2.", a);
-    console.log("impli3 ---------------");
-    for(var a in impli3) console.log("IMPLICIT.",a);
+    console.log("impli1 -----API Level1.",  Object.keys(impli1));
+    console.log("impli2 -----API Level2.",   Object.keys(impli2));
+    console.log("impli3 -------IMPLICIT.",   Object.keys(impli3));
 };
 
 
 // return IMPLICIT;  // is null!
 //return _on_cpp_loaded;
 // return null;
-return ImplicitService;
+return _ImplicitService;
 }());
+
 
 /* most times you need to write the following function */
 var IMPLICIT = null;  // is assigned to at _on_cpp_loaded();
-function _on_cpp_loaded() {
-    console.log("C++ ready.");
-    IMPLICIT = new ImplicitService();
+function _on_cpp_loaded(Module) {
+    IMPLICIT = new ImplicitService(Module);
     // IMPLICIT = new ImplicitWorkerService();
 
     // combines the IMPLICIT as a Worker/Node/npm library with the ThreeJS part. Not good! Solution: divide into two classes.
     // ImpliSolid.js, ...ImpliSolid3js.js (frontend)
     // Alternative: Globally: Module._on_cpp_loaded = ...;
 
+    /*
     // ugly
     if (typeof _assert_000 !== "undefined")
         assert = _assert_000;
+    */
+   Module.assert = function (cond, message) {
+    if (!cond) {
+        message = message || "Assertion failed for unspecified reason";
+        console.error(message);
+        console.error(message.stack);
+        throw new Error("assert ", message);
+    }
+  }
 
     return IMPLICIT;  // another usage
 };
@@ -864,6 +879,11 @@ var merge_dicts_nonrecursive = function() {
         }
     }
     return merged_dict;
+};
+
+if (typeof module !== 'undefined')
+module.exports = {
+  _on_cpp_loaded,
 };
 
 /**
