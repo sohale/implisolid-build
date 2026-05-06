@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- todo: rename: mp5interactive.html -->
 <html lang="en">
 <head>
 <title>MP5 in Action</title>
@@ -211,7 +212,7 @@
     var startup_text = JSON.stringify(asmjscb_example2);  // actually works well. (apart from bad ellipsoid if hard-coded )
 
 </script>
-<script type="text/javascript" src="../js-copy/asmjscb.js"></script>
+<script type="text/javascript" src="./js-copy/asmjscb.js"></script>
 <script>
 
     'use strict';
@@ -446,17 +447,17 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"> </script>
 < ! - -script type="text/javascript" src="../../../js_iteration_1/three_r79.js"> </script - - >
 <script type="text/javascript" src="../../../js_iteration_1/controls/OrbitControls_r79.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-copy/assert.js"></script>
+<script type="text/javascript" src="../../../examples/js-copy/assert.js"></script>
 <script type="text/javascript" src="../../../js_iteration_2/geometry79.js"></script>
 <script type="text/javascript" src="../../../js_iteration_2/implisolid_main.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-lib/example_objects.js"></script>
+<script type="text/javascript" src="../../../examples/js-lib/example_objects.js"></script>
 <script type="text/javascript" src="../../../js_iteration_2/js-lib/js_utils.js"></script>
 <script type="text/javascript" src="../../../js_iteration_2/js-lib/pointset_utils.js"></script>
 <script type="text/javascript" src="../../../js_iteration_2/js-lib/arrow_utils.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-lib/example_materials.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-lib/performance_graphs.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-lib/misc_props.js"></script>
-<script type="text/javascript" src="../../../js_iteration_2/examples/js-lib/boundingbox_utils.js"></script>
+<script type="text/javascript" src="../../../examples/js-lib/example_materials.js"></script>
+<script type="text/javascript" src="../../../examples/js-lib/performance_graphs.js"></script>
+<script type="text/javascript" src="../../../examples/js-lib/misc_props.js"></script>
+<script type="text/javascript" src="../../../examples/js-lib/boundingbox_utils.js"></script>
 -->
 
 <!-- ************************** ACE **************************-->
@@ -906,6 +907,7 @@ function startup_sequence() {
         */
 
         IMPLICIT = _on_cpp_loaded(Module);  // from implisolid_main.js
+        IMPLICIT.about();
         PS_UTILS = new PS_UTILS_CLASS(IMPLICIT);
 
         /*
@@ -952,7 +954,7 @@ function startup_sequence() {
         };
 </script>
 <script type="text/javascript" src="./js-copy/mcc2.compiled.js"></script>
-<!-- script type="text/javascript" src="../../../demos/build/mcc2.compiled.js"></script -->
+<!-- script type="text/javascript" src="../../../build/mcc2.compiled.js"></script -->
 
 <!--script type="text/javascript" src="https://beta.wedesign.live/mcc2.compiled.js"></script-->
 </html>

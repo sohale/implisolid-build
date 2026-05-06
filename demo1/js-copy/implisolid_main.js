@@ -38,6 +38,7 @@ function assert(cond, message) {
 var ImplicitService = (function () {
 'use strict';
 
+// todo: merge as a proper starndard class construtor (move on from this legacy prototype-based OOP)
 function init(service, Module) {
     'use strict';
 
@@ -45,6 +46,14 @@ function init(service, Module) {
     //main = Module.cwrap('main', 'number', []);
     //var service={}; //= newProducer //is an interface
     service.build_geometry = Module.cwrap('build_geometry', null, [ 'string', 'string']);
+
+    /*
+    The service.build_geometry_u is only used only on worker side (see js_iteration_2/js/worker_api.js )
+    Todo: merge those APIs (merge this init/contructore with `worker_api.js`'s equivalent part )
+    */ /*
+    service.build_geometry_u = Module.cwrap('build_geometry_u', null, [ 'string', 'string', 'string']);
+    */
+
     service.get_v_size = Module.cwrap('get_v_size', 'number', []);
     service.get_f_size = Module.cwrap('get_f_size', 'number', []);
     service.get_v = Module.cwrap('get_v', null, ['number']);
@@ -82,6 +91,31 @@ function init(service, Module) {
     }
     */
 
+    /*
+    // Access to raw heap:
+    service._c_heap_f32 = function() {
+        // C's Machine Model's Heap
+        // will not change(or will it?)
+        // service._c_heap = Module.HEAPF32;
+        return Module.HEAPF32;
+    }
+    */
+
+    // Usage not recommended. For use with build_geometry (otherwise, the output of build_geometry cannot be accessed, since the called will need to access C-Machine-Model's heap )
+    // Only for completion of Level1API
+    service._get_subarray_f32 = function (pointer_address, length) {
+        // start_address==pointer_address
+        const _FLOAT_SIZE = Float32Array.BYTES_PER_ELEMENT;
+        return Module.HEAPF32.subarray(pointer_address/_FLOAT_SIZE, pointer_address/_FLOAT_SIZE + length);
+        // usage: .set(float32Array);
+    }
+
+    // Usage not recommended. Same as _get_subarray_f32().
+    service._get_subarray_u32 = function (pointer_address, length) {
+        const _INT_SIZE = Uint32Array.BYTES_PER_ELEMENT
+        return Module.HEAPU32.subarray(pointer_address/_INT_SIZE, pointer_address/_INT_SIZE + length);
+    }
+
     service.init_ = function(){
         service.needs_deallocation = false;
     }
@@ -95,6 +129,7 @@ function init(service, Module) {
         service.needs_deallocation = false;
     }
 
+    // todo: document
     service.set_vect = function (float32Array) {
         // Accesses module
         const _FLOAT_SIZE = Float32Array.BYTES_PER_ELEMENT;
@@ -200,7 +235,8 @@ function init2(impli2, impli1, Module) {
 
     // mid-level API
 
-    /** Note that nomals are NOT queried & applied in this function.
+    /**
+    Note that normals are NOT queried & applied in this function.
     The inputs should be jsonified already. Although for bavkward compatibilty it is automatically converted.
     Note that in the similar "update" method, the polygonization_params must be non-JSONified. 
     the update methos is: update_geometry_from_json() or update_geometry()
@@ -213,7 +249,7 @@ function init2(impli2, impli1, Module) {
 
         if (typeof polygonization_params_str !== "string") {
             polygonization_params_str = JSON.stringify(polygonization_params_str);
-            console.error("Use a string, a JSONified settings:", polygonization_params_str);
+            console.warn("Use a string, a JSONified settings:", polygonization_params_str);
         }
 
         var startTime = new Date();
@@ -450,7 +486,8 @@ function init3(service3, service2) {
     service3.use_II_qem = true;
     service3.use_III = false;
     service3.use_noise = false;
-    service3.repeats = 0;
+    service3.repeats = 0; //
+    service3.repeats = 1;
     service3.custom_mc_settings = null;  // can be manually set in browser's console
 
 
@@ -825,6 +862,8 @@ var _ImplicitService = function(Module) {
     console.log("impli1 -----API Level1.",  Object.keys(impli1));
     console.log("impli2 -----API Level2.",   Object.keys(impli2));
     console.log("impli3 -------IMPLICIT.",   Object.keys(impli3));
+    impli3.about();
+
 };
 
 
@@ -837,7 +876,11 @@ return _ImplicitService;
 
 /* most times you need to write the following function */
 var IMPLICIT = null;  // is assigned to at _on_cpp_loaded();
-function _on_cpp_loaded(Module) {
+function _on_cpp_loaded() {
+    // Formerly as: _on_cpp_loaded(Module)
+    // Emscripten 3.x calls onRuntimeInitialized() with no arguments.
+    // `Module` is the global set in index.html and augmented by mcc2.compiled.js.
+
     IMPLICIT = new ImplicitService(Module);
     // IMPLICIT = new ImplicitWorkerService();
 

@@ -1,13 +1,19 @@
-commit 281e086eff6f50392f0af5449b08d10614bd31cd
-Author: Sohail Siadatnejad <sohale@gmail.com>
-Date:   Sat May 7 12:24:03 2022 +0100
+commit db6cffbce6c995ab32f597cf0aeca45ca014071a
+Author: Sohail Siadat <sohale@gmail.com>
+Date:   Wed May 6 01:37:57 2026 +0100
 
-    improvements for build (to be ablbe to push) and a missing file added to deploy
+    about()  print, and checking if it is hte real fresh one that is deployed and run in the demo
 \n\ngit diff\n
-diff --git a/docs/implisolid-build b/docs/implisolid-build
---- a/docs/implisolid-build
-+++ b/docs/implisolid-build
-@@ -1 +1 @@
--Subproject commit 8970313ee1f90d282c4d4ad75b42a34e9bf5ec8d
-+Subproject commit 8970313ee1f90d282c4d4ad75b42a34e9bf5ec8d-dirty
-Sat May  7 11:25:36 UTC 2022
+diff --git a/js_iteration_2/implisolid_main.js b/js_iteration_2/implisolid_main.js
+index c289cb0..4692b16 100644
+--- a/js_iteration_2/implisolid_main.js
++++ b/js_iteration_2/implisolid_main.js
+@@ -487,6 +487,7 @@ function init3(service3, service2) {
+     service3.use_III = false;
+     service3.use_noise = false;
+     service3.repeats = 0;
++    service3.repeats = 1;
+     service3.custom_mc_settings = null;  // can be manually set in browser's console
+ 
+ 
+Wed May  6 02:27:42 BST 2026
